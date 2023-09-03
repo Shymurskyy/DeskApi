@@ -78,15 +78,7 @@ namespace DeskApi.Controllers
                 return BadRequest("Invalid employee.");
             }
 
-            var existingReservation = _reservationService.GetReservationById(reservation.ReservationId);
-            if (existingReservation != null)
-            {
-                var timeDifference = reservation.ReservationDate.Subtract(DateTime.Now);
-                if (timeDifference.TotalHours <= 24)
-                {
-                    return BadRequest("Reservations can only be changed more than 24 hours before the start date.");
-                }
-            }
+            
 
             reservation.IsActive = true;
             var createdReservation = _reservationService.CreateReservation(reservation);
@@ -102,11 +94,27 @@ namespace DeskApi.Controllers
         [HttpPut("{id}")]
         public IActionResult UpdateReservation(int id, Reservation reservation)
         {
+            var existingReservation = _reservationService.GetReservationById(id); 
+
+            if (existingReservation == null)
+            {
+                return NotFound();
+            }
+
+            var timeDifference = existingReservation.ReservationDate.Subtract(DateTime.Now);
+
+            if (timeDifference.TotalHours <= 24)
+            {
+                return BadRequest("Reservations can only be changed more than 24 hours before the start date.");
+            }
+
             if (!_reservationService.UpdateReservation(id, reservation))
             {
                 return NotFound();
             }
-            return NoContent();
+
+            return Ok();
+
         }
 
         [HttpDelete("{id}")]
