@@ -1,0 +1,9 @@
+﻿namespace DeskApi.Models
+{
+    public class Location
+    {
+        public int LocationId { get; set; }
+        public string? LocationName { get; set; }
+        public List<Desk>? Desks { get; set; }
+    }
+}
